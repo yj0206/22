@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寻宝冒险</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="main-container">
+        <header>
+            <h1>寻宝冒险</h1>
+            <p>准备好开始冒险了吗？让我们一起探索隐藏的宝藏！</p>
+        </header>
+
+        <section id="game">
+            <button id="start-button">开始寻宝</button>
+            <div id="message-container"></div>
+        </section>
+    </div>
+
+    <script src="treasureMap.js"></script>
+    <script>
+        const messageContainer = document.getElementById("message-container");
+        const startButton = document.getElementById("start-button");
+
+        // 显示游戏信息
+        function showMessage(message, type = "info") {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add(type);
+            messageDiv.textContent = message;
+            messageContainer.appendChild(messageDiv);
+        }
+
+        // 启动寻宝游戏
+        async function startTreasureHunt() {
+            startButton.disabled = true;
+            showMessage("冒险开始！寻找第一个线索...");
+
+            try {
+                const clue = await TreasureMap.getInitialClue();
+                showMessage(clue);
+
+                const decodedLocation = await TreasureMap.decodeAncientScript(clue);
+                showMessage(decodedLocation);
+
+                const puzzleResult = await TreasureMap.solvePuzzle();
+                showMessage(puzzleResult, puzzleResult.includes("失败") ? "error" : "success");
+
+                const box = await TreasureMap.searchTemple(decodedLocation);
+                showMessage(box);
+
+                const treasure = await TreasureMap.openTreasureBox();
+                showMessage(treasure, "success");
+            } catch (error) {
+                showMessage("任务失败: " + error.message, "error");
+            }
+
+            startButton.disabled = false;
+        }
+
+        startButton.addEventListener("click", startTreasureHunt);
+    </script>
+</body>
+</html>
